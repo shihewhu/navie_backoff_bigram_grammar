@@ -5,12 +5,11 @@
 * word_dict: a map from label to word
 
 ###Instruction:
-* running generate
+* to run generate
 
     `./generate subgrammar <number>`
 
-* train bigram model:
+* to train bigram model:
 
     `./bigram -t <training_data> -w <word_dict> -m <output_model>`
-
 

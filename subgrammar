@@ -1,0 +1,694 @@
+# Comments start at a hash (#) character and go to the end of the line.
+# Ignore lines that only have whitespace.
+
+# All other lines should have a non-negative weight, a left-hand-side
+# nonterminal symbol, and one or more right-hand-side terminals and
+# nonterminals.
+
+# The start symbol is START.
+# These two rules are required; choose their weights carefully!
+# If S1 is chosen, the generator will use your human-written grammar.
+# If S2 is chosen, the generator will use a tag bigram model.
+
+# We start the weight for S2 at 0 so that you can play around with
+# generating sentences from your grammar without being confused by the
+# bigram model.
+99	START	S1
+0	START	S2
+
+## Beginning of human-written grammar.
+
+#	Edit the rules and weights in this part of the grammar.
+# This is a very, very, very simple grammar to get you started.
+
+#	Declarative
+30	S1	3sgNP	3sgVP	.
+30	S1	non3sgNP	non3sgVP	.
+#	Imperative
+1	S1	non3sgVPPresent	!
+1	S1	do	not	non3sgVPPresent	!
+#	yes-no-question
+1	S1	modal	NP	VPModal	?
+1	S1	does	3sgNP	non3sgVPPresent	?
+1	S1	do	non3sgNP	non3sgVPPresent	?
+1	S1	did	NP	VPPast	?
+1	S1	3sgBe	3sgNP	VPProgressive	?
+1	S1	non3sgBe	non3sgNP	VPProgressive	?
+1	S1	non3sgHave	non3sgNP	VPPerfect	?
+1	S1	non3sgHave	non3sgNP	been	VPProgressive	?
+1	S1	3sgHave	3sgNP	VPPerfect	?
+1	S1	3sgHave	3sgNP	been	VPProgressive	?
+#	wh-non-subject-question
+1	S1	Wh-DetN	does	3sgNP	3sgClauseVPPresent	?
+1	S1	Wh-DetN	do	non3sgNP	non3sgClauseVPPresent	?
+1	S1	Wh-DetN	3sgHave	3sgNP	ClauseVPPerfect	?
+1	S1	Wh-DetN	non3sgHave	non3sgNP	ClauseVPPerfect	?
+1	S1	Wh-DetN	3sgHave	3sgNP	been	ClauseVPProgressive	?
+1	S1	Wh-DetN	non3sgHave	non3sgNP	been	ClauseVPProgressive	?
+1	S1	Wh-DetN	modal	NP	ClauseVPModal	?
+1	S1	Wh-DetN	did	NP	ClauseVPPast	?
+
+#	NP
+#	predetminter
+1	NP	3sgNP
+1	NP	non3sgNP
+1	Pronoun	Proper
+1	Pronoun	non3sgPP
+1	Pronoun	3sgPP
+20	3sgNP	3sgPP
+20	3sgNP	Proper
+20	3sgNP	PPP	3sgNominal
+20	3sgNP	PPP	AP	3sgNominal
+20	3sgNP	3sgDet	3sgNominal
+20	3sgNP	3sgDet	AP	3sgNominal
+20	non3sgNP	non3sgPP
+20	non3sgNP	non3sgNominal
+20	non3sgNP	AP	non3sgNominal 
+0	non3sgNP	non3sgDet	non3sgNominal
+0	non3sgNP	non3sgDet	AP	non3sgNominal
+20	non3sgNP	PPP	non3sgNominal
+20	non3sgNP	PPP	AP	non3sgNominal
+1	non3sgNP	3sgNP	Conjunctions	3sgNP
+1	non3sgNP	3sgNP	Conjunctions	non3sgNP
+1	non3sgNP	non3sgNP	Conjunctions	non3sgNP
+# postmodifier
+30	3sgNominal	slNoun
+0	3sgNominal	3sgNominal	Clause
+1	3sgRelclause	that	3sgVP
+30	non3sgNominal	plNoun
+
+#	VP
+
+1	3sgVP	Adv	3sgVP
+1	3sgVP	3sgVP	Adv
+1	3sgVP	3sgVPPresent
+1	3sgVPPresent	3sgVerbTPresent	NP
+1	3sgVPPresent	3sgVerbTPresent	NP	PP
+1	3sgVPPresent	3sgVerbTPresent	Clause	PP
+1	3sgVPPresent	3sgVerbTPresent	Clause
+1	3sgVPPresent	3sgVerbIPresent	PP
+1	3sgVPPresent	3sgVerbIPresent	PP
+1	non3sgVP	Adv	non3sgVP
+1	non3sgVP	non3sgVP	Adv
+1	non3sgVP	non3sgVPPresent
+1	non3sgVPPresent	non3sgVerbTPresent	NP
+1	non3sgVPPresent	non3sgVerbTPresent	NP	PP
+1	non3sgVPPresent	non3sgVerbTPresent	Clause	PP
+1	non3sgVPPresent	non3sgVerbTPresent	Clause
+1	non3sgVPPresent	non3sgVerbIPresent	PP
+1	non3sgVPPresent	non3sgVerbIPresent	PP
+1	3sgVP	VPPast
+1	VPPast	VerbTPast	NP
+1	VPPast	VerbTPast	NP	PP
+1	VPPast	VerbTPast	Clause
+1	VPPast	VerbIPast
+1	VPPast	VerbIPast	PP
+
+#	modal
+1	3sgVP	modal	VPModal
+1	non3sgVP	modal	VPModal
+1	VPModal	be	AP
+1	VPModal	non3sgVPPresent
+1	VPModal	have	VPPerfect
+1	VPModal	have	been	VPProgressive
+1	VPModal	being	VPProgressive
+##	suggest is special we deal with it separately
+1	3sgVP	modal	suggest	Pronoun	VPModal
+#	passive
+1	3sgVP	3sgpassive
+1	3sgVP	3sgpassive	PP
+1	non3sgVP	non3sgpassive
+1	non3sgVP	non3sgpassive	PP
+1	3sgpassive	3sgBe	ClauseVPPerfect
+1	3sgpassive	3sgHave	been	ClauseVPPerfect
+1	non3sgpassive	non3sgBe	ClauseVPPerfect
+1	non3sgpassive	non3sgHave	been ClauseVPPerfect
+#	progressive
+1	3sgVP	3sgVPProgressive
+1	3sgVPProgressive	3sgBe	VPProgressive
+1	3sgBe	is
+1	3sgBe	was
+1	VPProgressive	VerbTProgressive	NP
+1	VPProgressive	VerbTProgressive	NP	PP
+1	VPProgressive	VerbTProgressive	Clause
+1	VPProgressive	VerbTProgressive	Clause	PP
+1	VPProgressive	VerbIProgressive
+1	VPProgressive	VerbIProgressive	PP
+1	VP	non3sgBe	VPProgressive
+1	non3sgBe	are
+1	non3sgBe	were
+1	VPProgressive	suggesting	Pronoun	VPModal
+#	perfect
+1	3sgVP	3sgHave	VPPerfect
+1	3sgHave	has
+1	3sgHave	had
+1	VPPerfect	VerbTPerfect	NP
+1	VPPerfect	VerbTPerfect	NP	PP
+1	VPPerfect	VerbTPerfect	Clause	PP
+1	VPPerfect	VerbTPerfect	Clause	PP
+1	VPPerfect	VerbIPerfect
+1	VPPerfect	VerbIPerfect	PP
+1	non3sgVP	non3sgHave	VPPerfect
+1	non3sgHave	have
+1	non3sgHave	had
+1	VPPerfect	suggested	Pronoun	VPModal
+#	perfect + progressive
+1	3sgVP	3sgHave	been	Adj
+1	non3sgVP	non3sgHave	been	Adj
+1	3sgVP	3sgHave	been	VPProgressive
+1	non3sgVP	non3sgHave	been	VPProgressive
+
+#	Clause
+1	Clause	wh-Clause
+1	Clause	that-Clause
+1	that-Clause	3sgthat-Clause
+1	that-Clause	non3sgthat-Clause
+1	3sgthat-Clause	that	3sgNP	3sgVP
+1	non3sgthat-Clause	that	non3sgNP	non3sgVP
+1	wh-Clause	3sgwh-Clause
+1	wh-Clause	non3sgwh-Clause
+1	3sgwh-Clause	Wh-DetN	3sgNP	3sgwh-ClauseVP
+1	non3sgwh-Clause	Wh-DetN	non3sgNP	non3sgwh-ClauseVP
+#1	3sgwh-ClauseVP
+#	ClauseVP	Present
+1	3sgwh-ClauseVP	3sgClauseVPPresent
+1	3sgClauseVPPresent	3sgVerbTPresent
+1	3sgClauseVPPresent	3sgVerbTPresent	PP
+1	non3sgwh-ClauseVP	non3sgClauseVPPresent
+1	non3sgClauseVPPresent	non3sgVerbTPresent
+1	non3sgClauseVPPresent	non3sgVerbTPresent	PP
+#	ClauseVP	Past
+1	3sgwh-ClauseVP	ClauseVPPast
+1	non3sgwh-ClauseVP	ClauseVPPast
+1	ClauseVPPast	VerbTPast
+1	ClauseVPPast	VerbTPast	PP
+#	ClauseVP	modal
+1	3sgwh-ClauseVP	modal	ClauseVPModal
+1	non3sgwh-ClauseVP	modal	ClauseVPModal
+1	ClauseVPModal	ClauseVPPresent
+1	ClauseVPModal	have	ClauseVPPerfect
+1	ClauseVPModal	be	ClauseVPProgressive
+1	ClauseVPModal	have	been	ClauseVPProgressive
+1	ClauseVPPresent	non3sgVerbTPresent
+1	ClauseVPPresent	non3sgVerbTPresent	PP
+#	ClauseVP	progressive
+1	3sgwh-ClauseVP	3sgBe	ClauseVPProgressive
+1	non3sgwh-ClauseVP	non3sgBe	ClauseVPProgressive
+1	ClauseVPProgressive	VerbTProgressive
+1	ClauseVPProgressive	VerbTProgressive	PP
+#	ClauseVP	perfect
+1	3sgwh-ClauseVP	3sgHave	ClauseVPPerfect
+1	non3sgwh-ClauseVP	non3sgHave	ClauseVPPerfect
+1	ClauseVPPerfect	VerbTPerfect
+1	ClauseVPPerfect	VerbTPerfect	PP
+#	ClauseVP	perfect	+	progressive
+1	3sgwh-ClauseVP	3sgHave	been	ClauseVPProgressive
+1	non3sgwh-ClauseVP	non3sgHave	been	ClauseVPProgressive
+
+#	AP
+1	AP	Adj
+1	AP	the	SupAdj
+1	AP	ComAdj
+#	PP
+1	PP	Prep	NP
+1	PP	Wh-Adv	ClausePP
+1	PP	PP	Prep	NP
+
+#	ClausePP
+1	ClausePP	3sgNP	3sgClausePPVP
+1	ClausePP	non3sgNP	non3sgClausePPVP
+1	3sgClausePPVP	Adv	3sgClausePPVP
+1	3sgClausePPVP	3sgClausePPVP	adv
+1	3sgClausePPVP	3sgClausePPVPPresent
+1	3sgClausePPVPPresent	3sgVerbTPresent	NP
+1	3sgClausePPVPPresent	3sgVerbTPresent	Clause
+1	non3sgClausePPVP	Adv	non3sgClausePPVP
+1	non3sgClausePPVP	non3sgClausePPVP	Adv
+1	non3sgClausePPVP	non3sgClausePPVPPresent
+1	non3sgClausePPVPPresent	non3sgVerbTPresent	NP
+1	non3sgClausePPVPPresent	non3sgVerbTPresent	Clause
+1	3sgClausePPVP	VPPast
+1	VPPast	VerbTPast	NP
+1	VPPast	VerbTPast	Clause
+1	VPPast	VerbIPast
+
+#	modal
+1	3sgClausePPVP	modal	VPModal
+1	non3sgClausePPVP	modal	VPModal
+1	VPModal	be	AP
+1	VPModal	non3sgClausePPVPPresent
+1	VPModal	have	VPPerfect
+1	VPModal	have	been	VPProgressive
+1	VPModal	being	VPProgressive
+##	suggest is special we deal with it separately
+1	3sgClausePPVP	modal	suggest	Pronoun	VPModal
+#	passive
+1	3sgClausePPVP	3sgpassive
+1	non3sgClausePPVP	non3sgpassive
+1	3sgpassive	3sgBe	ClauseVPPerfect
+1	3sgpassive	3sgHave	been	ClauseVPPerfect
+1	non3sgpassive	non3sgBe	ClauseVPPerfect
+1	non3sgpassive	non3sgHave	been ClauseVPPerfect
+#	progressive
+1	3sgClausePPVP	3sgClausePPVPProgressive
+1	3sgClausePPVPProgressive	3sgBe	VPProgressive
+1	VPProgressive	VerbTProgressive	NP
+1	VPProgressive	VerbTProgressive	Clause
+1	VPProgressive	VerbIProgressive
+1	VP	non3sgBe	VPProgressive
+1	VPProgressive	suggesting	Pronoun	VPModal
+#	perfect
+1	3sgClausePPVP	3sgHave	VPPerfect
+1	3sgHave	has
+1	3sgHave	had
+1	VPPerfect	VerbTPerfect	NP
+1	VPPerfect	VerbIPerfect
+1	non3sgClausePPVP	non3sgHave	VPPerfect
+1	non3sgHave	have
+1	non3sgHave	had
+1	VPPerfect	suggested	Pronoun	VPModal
+#	perfect + progressive
+1	3sgClausePPVP	3sgHave	been	Adj
+1	non3sgClausePPVP	non3sgHave	been	Adj
+1	3sgClausePPVP	3sgHave	been	VPProgressive
+1	non3sgClausePPVP	non3sgHave	been	VPProgressive
+## End of human-written grammar
+
+## Vocabulary section
+# This is a hand-generated set of preterminal rules.
+# It specifies a simple tag set which will be handled by the S2
+# grammar and which can (though doesn't necessarily need to be)
+# handled by the S1 grammar.
+
+# The weights and left-hand-side tags given here may be changed, but
+# no new vocabulary items are to be added. That keeps you from
+# stumping other parsers simply by adding new words.
+
+# Miscellaneous items that don't fit into any of our simple tags are
+# given to Misc.	You will want to develop your own tags for these!
+
+
+# Singular and mass nouns.	Notice that only the
+# ones that start with consonants get our Noun tag.
+1	slNoun	castle
+1	slNoun	king
+1	slNoun	defeater
+1	slNoun	sovereign
+1	slNoun	servant
+1	slNoun	corner
+1	slNoun	land
+1	slNoun	quest
+1	slNoun	chalice
+1	slNoun	master
+1	slNoun	horse
+1	slNoun	fruit
+1	slNoun	swallow
+1	slNoun	sun
+1	slNoun	winter
+1	slNoun	coconut
+1	slNoun	pound
+1	slNoun	husk
+1	slNoun	home
+1	slNoun	weight
+1	slNoun	story
+
+# Determiners.
+1	3sgDet	a
+1	3sgDet	another
+1	3sgDet	any
+1	3sgDet	each
+1	3sgDet	every
+1	3sgDet	no
+1	3sgDet	that
+1	3sgDet	the
+1	3sgDet	this
+
+# Prepositions.
+1	Prep	above
+1	Prep	across
+1	Prep	at
+1	Prep	below
+1	Prep	by
+1	Prep	for
+1	Prep	from
+1	Prep	into
+1	Prep	near
+1	Prep	of
+1	Prep	on
+1	Prep	over
+1	Prep	through
+1	Prep	with
+
+# Proper nouns.	Note that our Proper tag is just for people.
+1	Proper	Arthur
+1	Proper	Guinevere
+1	Proper	Sir Lancelot
+1	Proper	Sir Bedevere
+1	Proper	Zoot
+1	Proper	Dingo
+1	Proper	Patsy
+1	Proper	Uther Pendragon
+
+# Verbs (third person singular present).
+# Note that only transitive verbs get our VerbT tag,
+# and some of those could also function as intransitives!
+1	3sgVerbTPresent	has
+1	3sgVerbTPresent	covers
+1	3sgVerbTPresent	is
+1	3sgVerbTPresent	drinks
+1	3sgVerbTPresent	carries
+1	3sgVerbTPresent	rides
+
+# End-of-sentence.
+1	Misc	!
+1	Misc	.
+1	Misc	?
+
+# Pauses.
+1	Misc	,
+1	Misc	...
+1	Misc	--
+1	Misc	;
+1	Misc	:
+
+# Coordinating conjunctions.
+1	Conjunctions	and
+1	Conjunctions	but
+1	Conjunctions	or
+1	Conjunctions	either
+1	Conjunctions	nor
+1	Conjunctions	neither
+1	Conjunctions	so
+
+# Numbers.
+1	Misc	eight
+1	Misc	five
+1	Misc	one
+1	Misc	5.5
+1	Misc	sixty
+1	Misc	5,000
+
+# Expletive.
+1	Misc	there
+
+# Subordinating conjunctions.
+1	Misc	that
+1	Misc	so
+1	Misc	while
+1	Misc	because
+1	Misc	if
+
+# Modals.
+1	modal	can
+1	modal	could
+1	modal	may
+1	modal	might
+1	modal	must
+1	modal	ought
+1	modal	shall
+1	modal	should
+1	modal	will
+1	modal	would
+
+
+# Adjectives.
+1	Adj	bloody
+1	Adj	weary
+1	Adj	unable
+1	Adj	trusty
+1	Adj	further
+1	Adj	sacred
+1	Adj	tropical
+1	Adj	indigenous
+1	Adj	temperate
+1	Adj	hot
+1	Adj	lucky
+1	Adj	simple
+1	Adj	tiny
+1	Adj	hard
+1	Adj	sensational
+1	Adj	comparable
+1	Adj	angolian
+1	Adj	yellow
+1	Adj	plodding
+
+# Comparative adjectives.
+1	ComAdj	bloodier
+1	ComAdj	wearier
+1	ComAdj	trustier
+1	ComAdj	hotter
+1	ComAdj	simpler
+1	ComAdj	tinier
+1	ComAdj	harder
+
+# Superlative adjectives.
+1	SupAdj	bloodiest
+1	SupAdj	weariest
+1	SupAdj	trustiest
+1	SupAdj	hottest
+1	SupAdj	simplest
+1	SupAdj	tiniest
+1	SupAdj	hardest
+
+# Plural nouns.
+1	plNoun	coconuts
+1	plNoun	halves
+1	plNoun	snows
+1	plNoun	mountains
+1	plNoun	areas
+1	plNoun	strangers
+1	plNoun	inches
+1	plNoun	snakes
+1	plNoun	ants
+1	plNoun	nights
+
+# More proper nouns, not people.
+
+1	slNoun	Camelot
+1	slNoun	England
+1	slNoun	Holy Grail
+1	slNoun	Round Table
+
+# Plural proper nouns.
+1	plNoun	Britons
+1	plNoun	Saxons
+
+# Personal pronouns.
+1	3sgPP	he
+1	Misc	her
+1	Misc	him
+1	3sgPP	it
+1	3sgPP	one
+1	3sgPP	she
+1	Misc	them
+1	non3sgPP	they
+
+
+# Possessive personal pronouns
+1	PPP	her
+1	PPP	his
+1	PPP	its
+1	PPP	their
+
+# Adverbs.
+1	Adv	again
+1	Adv	already
+1	Adv	currently
+1	Adv	frequently
+1	Adv	precisely
+1	Adv	south
+1	Adv	successfully
+1	Adv	unfortunately
+
+# 'do'/'does'
+1	3sgDo	do
+1	3sgDo	does
+
+# 'to'
+1	Misc	to
+
+# 'not'
+1	Misc	not
+
+# Verbs (base form).
+1	Misc	have
+1	Misc	speak
+1	Misc	cover
+1	Misc	be
+1	Misc	ride
+1	Misc	drink
+1	Misc	grow
+1	Misc	carry
+1	Misc	suggest
+1	Misc	migrate
+1	Misc	know
+
+# Verbs (past tense).
+1	VerbTPast	had
+1	VerbTPast	spoke
+1	VerbTPast	covered
+1	VerbTPast	was
+1	VerbTPast	were
+1	VerbTPast	rode
+1	VerbTPast	drank
+1	VerbTPast	grew
+1	VerbTPast	carried
+1	Misc	suggested
+1	VerbTPast	migrated
+1	VerbTPast	knew
+
+# Verbs (present participles).
+1	VerbTProgressive	having
+1	VerbTProgressive	speaking
+1	VerbTProgressive	covering
+1	VerbTProgressive	being
+1	VerbTProgressive	riding
+1	VerbTProgressive	drinking
+1	VerbTProgressive	growing
+1	VerbTProgressive	carrying
+1	Misc	suggesting
+1	VerbTProgressive	migrating
+1	VerbTProgressive	knowing
+
+# Verbs (past participle).
+1	VerbTPerfect	had
+1	VerbTPerfect	spoken
+1	VerbTPerfect	covered
+1	VerbTPerfect	been
+1	VerbTPerfect	ridden
+1	VerbTPerfect	drunk
+1	VerbTPerfect	grown
+1	VerbTPerfect	carried
+1	Misc	suggested
+1	VerbTPerfect	migrated
+1	VerbTPerfect	known
+
+# More third person singular verbs.
+1	3sgVerbTPresent	speaks
+1	3sgVerbTPresent	grows
+1	3sgVerbTPresent	goes
+1	3sgVerbTPresent	migrates
+1	Misc	suggests
+1	3sgVerbTPresent	knows
+
+# Verbs (present, plural, third person).
+1	non3sgVerbTPresent	have
+1	non3sgVerbTPresent	speak
+1	non3sgVerbTPresent	cover
+1	Misc	are
+1	non3sgVerbTPresent	ride
+1	non3sgVerbTPresent	drink
+1	non3sgVerbTPresent	grow
+1	non3sgVerbTPresent	carry
+1	Misc	suggest
+1	non3sgVerbTPresent	migrate
+1	non3sgVerbTPresent	know
+
+# Verbs(intransitives)
+1	non3sgVerbIPresent	run
+1	non3sgVerbIPresent	walk
+1	non3sgVerbIPresent	sit
+1	non3sgVerbIPresent	lie
+
+#	Verbs(intransitives 3sg)
+1	3sgVerbIPresent	runs
+1	3sgVerbIPresent	walks
+1	3sgVerbIPresent	sits
+1	3sgVerbIPresent	lies
+
+# Verbs(intransitives past)
+1	VerbIPast	ran
+1	VerbIPast	walked
+1	VerbIPast	sit
+1	VerbIPast	lay
+
+# Verbs(intransitives past participle)
+1	VerbIPerfect	run
+1	VerbIPerfect	walked
+1	VerbIPerfect	sitten
+1	VerbIPerfect	lain
+
+#	Verbs(intransitives	Progressive)
+1	VerbIProgressive	running
+1	VerbIProgressive	walking
+1	VerbIProgressive	sitting
+1	VerbIProgressive	lying
+
+# Wh-determiners.
+1	Wh-DetN	what
+1	Wh-DetN	which	3sgNominal
+1	Wh-DetN	which	non3sgNominal
+1	Wh-Det	what
+1	Wh-Det	which
+
+# Wh-pronouns.
+1	Misc	what
+1	Misc	who
+
+# Wh possessive pronoun.
+1	Wh-PP	whose	3sgNominal
+1	Wh-PP	whose	non3sgNominal
+
+# Wh-adverbs
+1	Wh-Adv	how
+1	Wh-Adv	when
+1	Wh-Adv	where
+1	Wh-Adv	why
+
+
+# Possessive marker.
+1	Misc	's
+
+## S2 tag bigram model
+
+# You may change the weights here or add new rules if you introduce
+# new tags.
+
+1	S2	_Det
+1	S2	_Misc
+1	S2	_Noun
+1	S2	_Prep
+1	S2	_Proper
+1	S2	_VerbT
+1	_Det	Det
+1	_Det	Det	_Det
+1	_Det	Det	_Misc
+1	_Det	Det	_Noun
+1	_Det	Det	_Prep
+1	_Det	Det	_Proper
+1	_Det	Det	_VerbT
+1	_Misc	Misc
+1	_Misc	Misc	_Det
+1	_Misc	Misc	_Misc
+1	_Misc	Misc	_Noun
+1	_Misc	Misc	_Prep
+1	_Misc	Misc	_Proper
+1	_Misc	Misc	_VerbT
+1	_Noun	Noun
+1	_Noun	Noun	_Det
+1	_Noun	Noun	_Misc
+1	_Noun	Noun	_Noun
+1	_Noun	Noun	_Prep
+1	_Noun	Noun	_Proper
+1	_Noun	Noun	_VerbT
+1	_Prep	Prep
+1	_Prep	Prep	_Det
+1	_Prep	Prep	_Misc
+1	_Prep	Prep	_Noun
+1	_Prep	Prep	_Prep
+1	_Prep	Prep	_Proper
+1	_Prep	Prep	_VerbT
+1	_Proper	Proper
+1	_Proper	Proper	_Det
+1	_Proper	Proper	_Misc
+1	_Proper	Proper	_Noun
+1	_Proper	Proper	_Prep
+1	_Proper	Proper	_Proper
+1	_Proper	Proper	_VerbT
+1	_VerbT	VerbT
+1	_VerbT	VerbT	_Det
+1	_VerbT	VerbT	_Misc
+1	_VerbT	VerbT	_Noun
+1	_VerbT	VerbT	_Prep
+1	_VerbT	VerbT	_Proper
+1	_VerbT	VerbT	_VerbT

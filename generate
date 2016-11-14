@@ -1,0 +1,66 @@
+#!/usr/bin/env python
+# encoding: utf-8
+
+import numpy as np
+import sys
+from collections import namedtuple
+
+Rule = namedtuple('Rule', ['weight', 'nonterminal', 'generated_nons'])
+
+
+class Generator(object):
+    def __init__(self, script_name):
+        self.rules = self.read_rules(script_name)
+
+    def read_rules(self, script_name):
+        rules = {}
+        with open(script_name, 'rb') as s:
+            for line in s:
+                if line[0] == '#' or line[0] == '\n':
+                    continue
+                weight, nonterminal, rest = line.strip('\n').split('\t', 2)
+                generated_nons = rest.split()
+                rule = Rule(weight=int(weight), nonterminal=nonterminal, generated_nons=generated_nons)
+                try:
+                    rules[nonterminal].append(rule)
+                except:
+                    rules[nonterminal] = [rule]
+        for nonterminal, rule_list in rules.iteritems():
+            weight_sum = sum(r.weight for r in rule_list)
+            rule_list.append([float(r.weight) / weight_sum for r in rule_list])
+        return rules
+
+    def generate(self):
+        try:
+            start_rules = self.rules['START']
+        except KeyError as e:
+            print "You must inclue start rule !"
+            raise e
+        prob = start_rules[-1]
+        picked_idx = np.random.choice(range(len(start_rules) - 1), 1, p=prob)
+        rule = start_rules[picked_idx]
+        rewritten_sentence = []
+        for non in rule.generated_nons:
+            self._dfs_generate(non, rewritten_sentence)
+        return " ".join(rewritten_sentence)
+
+    def _dfs_generate(self, non, rewritten_sentence):
+        rule_list = self.rules.get(non, None)
+        if not rule_list:
+            rewritten_sentence.append(non)
+            return
+        prob = rule_list[-1]
+        picked_idx = np.random.choice(range(len(rule_list) - 1), 1, p=prob)
+        rule = rule_list[picked_idx]
+        for non in rule.generated_nons:
+            self._dfs_generate(non, rewritten_sentence)
+
+
+if __name__ == "__main__":
+    g = Generator(sys.argv[1])
+    times = int(sys.argv[2])
+    results = [g.generate() for _ in range(times)]
+    for r in results:
+        print r
+    print "+++++++"
+    print "average length is {}".format(float(sum(len(r.split()) for r in results)) / times)

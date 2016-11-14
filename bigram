@@ -1,0 +1,92 @@
+#!/usr/bin/env python
+# encoding: utf-8
+import itertools
+import os
+import sys
+import getopt
+
+
+class BackOffBigram(object):
+    def __init__(self, word_dict_filename='word_dict', state_tag_filename='tags'):
+        self.word_dict_filename = word_dict_filename
+        self.state_tag_filename = state_tag_filename
+        self.tags, self.word_dict = self.create_tags_word_dict()
+
+    def create_tags_word_dict(self):
+        tagging_dict = {}
+        tags = set()
+        with open(self.word_dict_filename) as t:
+            for line in t:
+                tag, word = line.strip('\n').split('\t')
+                tagging_dict[word] = tag
+                tags.add(tag)
+        return list(tags), tagging_dict
+
+    def train(self, training_data='training_data', model_filename='model'):
+        transfers = {}
+        with open(training_data, 'rb') as t:
+            for line in t:
+                words = line.split()
+                formalized_words = []
+                i = 0
+                while i < len(words):
+                    try:
+                        self.word_dict[words[i]]
+                        formalized_words.append(words[i])
+                        i += 1
+                    except KeyError:
+                        try:
+                            self.word_dict[" ".join([words[i], words[i + 1]])]
+                            formalized_words.append(" ".join([words[i], words[i + 1]]))
+                            i += 2
+                        except Exception as e:
+                            print "Opps, tagging error with {}".format(words[i])
+                            raise e
+                transfer = "S2\t{}".format(self.word_dict[formalized_words[0]])
+                transfers[transfer] = transfers.get(transfer, 0) + 1
+                for i in range(len(formalized_words) - 1):
+                    try:
+                        transfer = "{}\t{}".format(self.word_dict[formalized_words[i]], self.word_dict[formalized_words[i + 1]])
+                        transfers[transfer] = transfers.get(transfer, 0) + 1
+                    except Exception as e:
+                        raise e
+        with open(model_filename, 'wb') as m:
+            m.write("1\tSTART\tS2\n")
+            for w, l in self.word_dict.iteritems():
+                line = "1\t{}\t{}\n".format(l, w)
+                m.write(line)
+            for tag in self.tags:
+                transfer = "S2\t{}".format(tag)
+                weight = transfers.get(transfer, 0)
+                line = "{}\tS2\t_{}\n".format(weight, tag)
+                m.write(line)
+            for tag in self.tags:
+                line = "1\t_{}\t{}\n".format(tag, tag)
+                m.write(line)
+            for w1, w2 in itertools.permutations(self.tags, 2):
+                transfer = "{}\t{}".format(w1, w2)
+                weight = transfers.get(transfer, 0)
+                line = "{}\t_{}\t{}\t_{}\n".format(weight, w1, w1, w2)
+                m.write(line)
+
+
+def get_opt_arg(argv):
+    opts, _ = getopt.getopt(argv, "t:w:m:")
+    training_data = 'training_data'
+    model = 'model'
+    word_dict = 'word_dict'
+    for (opt, arg) in opts:
+        if opt == '-t':
+            training_data = arg
+        elif opt == '-m':
+            model = arg
+        elif opt == '-w':
+            word_dict = arg
+    return training_data, word_dict, model
+
+
+if __name__ == "__main__":
+    training_data, word_dict, model = get_opt_arg(sys.argv[1:])
+    bb = BackOffBigram(word_dict_filename=word_dict)
+    bb.train(training_data, model)
+    os.system("cat model >> grammar5")

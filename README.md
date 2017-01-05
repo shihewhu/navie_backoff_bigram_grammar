@@ -7,9 +7,12 @@
 ###Instruction:
 * to run generate
 
-    `./generate subgrammar <number>`
+    ```
+    ./generate subgrammar <number>
+    ```
 
 * to train bigram model:
 
-    `./bigram -t <training_data> -w <word_dict> -m <output_model>`
-
+    ```
+    ./bigram -t <training_data> -w <word_dict> -m <output_model>`
+    ```
